@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure the AWSJenkinsDeploymentRole to enable use of AWS CloudFormation in Jenkins.
+
+Parameters:
+  AdministratorAccountId:
+    Type: String
+    Description: AWS Account Id of the Jenkins administrator account
+    MaxLength: 12
+    MinLength: 12
+
+Resources:
+  AdministrationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: AWSJenkinsDeploymentRole
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal:
+              AWS:
+                - !Ref AdministratorAccountId
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies: 
+        - 
+          PolicyName: "AWSJenkinsDeploymentRole"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    aws:RequestedRegion: 
+                      - "us-east-1"

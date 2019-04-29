@@ -11,8 +11,23 @@ pipeline{
 
     }
 
-    stages {
-        stage('Create StackSet') {
+    stages {        
+        stage('Assume Jekins Role') {
+            steps {
+                sh '''
+                    aws cloudformation list-stack-sets
+                '''
+            }
+            post {
+                failure {
+                    script {
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+        stage('Create EC2') {
             steps {
                 sh '''
                     terraform -v
