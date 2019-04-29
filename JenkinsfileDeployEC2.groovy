@@ -15,7 +15,7 @@ pipeline{
         stage('Assume Jekins Role') {
             steps {
                 sh '''
-                    aws cloudformation list-stack-sets
+                    aws sts assume-role --role-arn arn:aws:iam::123456789012:role/xaccounts3access --role-session-name s3-access-example
                 '''
             }
             post {
@@ -30,7 +30,7 @@ pipeline{
         stage('Create EC2') {
             steps {
                 sh '''
-                    terraform -v
+                    aws cloudformation create-stack --stack-name bax-application-ec2 --template-body file://ApplicationInstance.yml
                 '''
             }
             post {

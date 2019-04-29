@@ -1,0 +1,266 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Blue Mountain RAM Infrastructure Template
+
+Metadata:
+  Comment: "
+  List of mandatory tags to set in the stack creation wizard:
+    - Env:
+        Description: The name of the environment being deployed to.
+        Type: String
+        Default: dev
+        AllowedValues: dev, test, prod
+    - Appname:
+        Description: The name of the application being deployed.
+        Type: String
+        Default: blue-mountain-ram
+    - Appid:
+        Description: The unique number assigned to this app during assessment
+        Type: String
+        Default: 238202
+    - Owner:
+        Description: Email address of Owner or Distribution list
+        Type: String
+        Default: 'GLBL.MEDPROD.BLUEMONTAIN.APP.TEAM@baxter.com'
+    - Costcenter:
+        Description: Cost Center Number of this project
+        Type: String
+        Default: 1001701355
+  "
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Stack Configuration"
+        Parameters:
+          - Env
+          - Appname
+          - VpcID
+          - CoreWinSecurityGroups
+          - KMSKeyId
+      -
+        Label:
+          default: "Blue Mountain Servers Configuration"
+        Parameters:
+          - AppServersSize
+          - AppServer1AMI
+          - AppServer1Name
+          - AppSubnet1
+      -
+        Label:
+          default: "Backups Configuration"
+        Parameters:
+          - BackupRequired
+
+Parameters:
+  Env:
+    Description: The name of the environment being deployed to.
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+  Appname:
+    Description: The name of the application being deployed.
+    Type: String
+    Default: blue-mountain-ram
+
+  VpcID:
+    Description: VPC ID where to deploy
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-008d96f53d94d7e96
+
+  CoreWinSecurityGroups:
+    Description: Baxter Core Win Security Group
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: sg-0acde13b66c72df3b
+
+  KMSKeyId:
+    Description: KMS Key encryption
+    Type: String
+    Default: "arn:aws:kms:us-east-2:896734382569:key/f9953768-f645-4631-99ae-27ce90f04093"
+
+  AppServersSize:
+    Description: Frontend Server instance type
+    Type: String
+    Default: t3.large
+    AllowedValues:
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.18xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+
+  AppSubnet1:
+    Description: "Subnet ID of the Frontend Server 1"
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0a450499ffc8c03d8
+
+  AppServer1AMI:
+    Description: AMI ID for Frontend instance 1
+    Type: AWS::EC2::Image::Id
+    Default: ami-080955706b2720e22
+  AppServer1Name:
+    Description: Frontend Server 1 name
+    Type: String
+    Default: 'USOHBLMRAM900'
+
+  BackupRequired:
+    Type: String
+    Default: 'true'
+    Description: Set true/false if AMI backups is required
+Mappings:
+  Tags:
+    Appid:
+      Value: '238202'
+    Appname:
+      Value: blue-mountain-ram
+    Owner:
+      Value: GLBL.MEDPROD.BLUEMONTAIN.APP.TEAM@baxter.com
+    Costcenter:
+      Value: '1001701355'
+    powerOff:
+      Value: NA
+    powerOn:
+      Value: NA
+
+Resources:           
+  AppServer1:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      BlockDeviceMappings:
+        -
+          DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: '100'
+            VolumeType: gp2
+            DeleteOnTermination: "true"
+      ImageId:
+        Ref: AppServer1AMI
+      InstanceType:
+        Ref: AppServersSize
+      Monitoring: "true"
+      IamInstanceProfile: !Join
+        - '-'
+        - - 'baxaws'
+          - Ref: Env
+          - Ref: Appname
+          - 'app-ec2-role'
+      SecurityGroupIds:
+        - Ref: CoreWinSecurityGroups
+      SubnetId:
+        Ref: AppSubnet1
+      Tags:
+        - Key: Name
+          Value: !Ref AppServer1Name
+        - Key: Backup
+          Value: !Ref BackupRequired
+        - Key: Env
+          Value: !Ref Env
+        - Key: Appid
+          Value: !FindInMap 
+            - Tags
+            - Appid
+            - Value
+        - Key: Appname
+          Value: !FindInMap 
+            - Tags
+            - Appname
+            - Value
+        - Key: Owner
+          Value: !FindInMap 
+            - Tags
+            - Owner
+            - Value
+        - Key: Costcenter
+          Value: !FindInMap 
+            - Tags
+            - Costcenter
+            - Value
+        - Key: powerOff
+          Value: !FindInMap 
+            - Tags
+            - powerOff
+            - Value
+        - Key: powerOn
+          Value: !FindInMap 
+            - Tags
+            - powerOn
+            - Value
+
+  DataDisk: 
+    Type: "AWS::EC2::Volume"
+    Properties:
+      AvailabilityZone: !GetAtt AppServer1.AvailabilityZone
+      Size : 100
+      VolumeType: gp2
+      Tags:
+          - Key: Name
+            Value: !Ref AppServer1Name
+          - Key: Env
+            Value: !Ref Env
+          - Key: Appid
+            Value: !FindInMap 
+              - Tags
+              - Appid
+              - Value
+          - Key: Appname
+            Value: !FindInMap 
+              - Tags
+              - Appname
+              - Value
+          - Key: Owner
+            Value: !FindInMap 
+              - Tags
+              - Owner
+              - Value
+          - Key: Costcenter
+            Value: !FindInMap 
+              - Tags
+              - Costcenter
+              - Value
+              
+  MountPoint:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      InstanceId: !Ref AppServer1
+      VolumeId: !Ref DataDisk
+      Device: /dev/sdh
+
+  DomainJoinSSMDocumentAssociation:
+    Type: "AWS::SSM::Association"
+    Properties:
+      AssociationName: !Join
+          - '-'
+          - - 'baxaws'
+            - Ref: Env
+            - Ref: Appname
+            - 'ad-association'
+      Name: '{{resolve:ssm:/BAX/SSM/DOC/ADJOIN:1}}'
+      Targets:
+      - Key: InstanceIds
+        Values:
+          - Ref: AppServer1
