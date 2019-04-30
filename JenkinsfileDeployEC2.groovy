@@ -6,6 +6,8 @@ pipeline{
         choice(name: 'ACCOUNT', choices: ['351098335058','272318516296'], description: 'AWS Account')
         choice(name: 'ENV', choices: ['dev','test','prod'], description: 'Environment')
         string(name: 'VPCId', description: 'VPC Id')
+        string(name: 'AppSubnet', description: 'Subnet Id')
+        string(name: 'AppServerAMI', description: 'AMI Id')
     }
 
     environment {
@@ -68,7 +70,10 @@ pipeline{
                     --template-file ApplicationInstance.yml \
                     --parameter-overrides \
                         Env="${ENV_TAG}" \
+                        Appname="ec2-app-instance" \
                         VPCId="${VPCID}" \
+                        AppSubnet="${AppSubnet}" \
+                        AppServerAMI=${AppServerAMI} \
                 '''
             }
             post {

@@ -65,15 +65,13 @@ Parameters:
     Description: "VCP Id"
     Type: AWS::EC2::VPC::Id
 
-  AppSubnet1:
+  AppSubnet:
     Description: "Subnet ID of the Frontend Server 1"
     Type: AWS::EC2::Subnet::Id
-    Default: subnet-0a450499ffc8c03d8
 
-  AppServer1AMI:
+  AppServerAMI:
     Description: AMI ID for Frontend instance 1
     Type: AWS::EC2::Image::Id
-    Default: ami-080955706b2720e22
 
 Resources:
   AppServerSG:
@@ -104,7 +102,7 @@ Resources:
             VolumeType: gp2
             DeleteOnTermination: true
       ImageId:
-        Ref: AppServer1AMI
+        Ref: AppServerAMI
       InstanceType:
         Ref: AppServersSize
       Monitoring: true
@@ -114,7 +112,7 @@ Resources:
           - Ref: Appname
           - 'app-ec2-role'
       SubnetId:
-        Ref: AppSubnet1
+        Ref: AppSubnet
       SecurityGroups:
         - Ref: AppServerSG
       Tags:
