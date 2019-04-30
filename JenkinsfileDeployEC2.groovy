@@ -69,7 +69,7 @@ pipeline{
                     aws cloudformation deploy --stack-name bax-application-ec2 \
                     --template-file ApplicationInstance.yml \
                     --parameter-overrides \
-                        Env="${ENV_TAG}" \
+                        Env="${ENV}" \
                         Appname="ec2-app-instance" \
                         VPCId="${VPCID}" \
                         AppSubnet="${AppSubnet}" \
