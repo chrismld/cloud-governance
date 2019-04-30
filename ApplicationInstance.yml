@@ -107,11 +107,6 @@ Resources:
       InstanceType:
         Ref: AppServersSize
       Monitoring: true
-      IamInstanceProfile: !Join
-        - '-'
-        - - Ref: Env
-          - Ref: Appname
-          - 'app-ec2-role'
       SubnetId:
         Ref: AppSubnet
       SecurityGroupIds:
