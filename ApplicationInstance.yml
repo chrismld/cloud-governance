@@ -114,7 +114,7 @@ Resources:
           - 'app-ec2-role'
       SubnetId:
         Ref: AppSubnet
-      SecurityGroups:
+      SecurityGroupIds:
         - !Ref AppServerSG
       Tags:
         - Key: Name
