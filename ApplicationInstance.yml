@@ -61,6 +61,10 @@ Parameters:
       - r4.8xlarge
       - r4.16xlarge
 
+  VPCId:
+    Description: "VCP Id"
+    Type: AWS::EC2::VPC::Id
+
   AppSubnet1:
     Description: "Subnet ID of the Frontend Server 1"
     Type: AWS::EC2::Subnet::Id
@@ -71,7 +75,24 @@ Parameters:
     Type: AWS::EC2::Image::Id
     Default: ami-080955706b2720e22
 
-Resources:           
+Resources:
+  AppServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow connection to the application
+      VpcId:
+        Ref: VPCId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+
   AppServer1:
     Type: "AWS::EC2::Instance"
     Properties:
@@ -94,6 +115,8 @@ Resources:
           - 'app-ec2-role'
       SubnetId:
         Ref: AppSubnet1
+      SecurityGroups:
+        - Ref: AppServerSG
       Tags:
         - Key: Name
           Value: !Ref Appname
@@ -107,6 +130,7 @@ Resources:
     Properties:
       AvailabilityZone: !GetAtt AppServer1.AvailabilityZone
       Size : 100
+      Encrypted: true
       VolumeType: gp2
       Tags:
           - Key: Name
