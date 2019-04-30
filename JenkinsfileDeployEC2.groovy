@@ -4,6 +4,7 @@ pipeline{
 
     parameters {
         choice(name: 'ACCOUNT', choices: ['351098335058','272318516296'], description: 'AWS Account')
+        choice(name: 'REGION', choices: ['us-east-1','us-west-2'], description: 'AWS Region')
         choice(name: 'ENV', choices: ['dev','test','prod'], description: 'Environment')
         string(name: 'VPCID', description: 'VPC Id')
         string(name: 'AppSubnet', description: 'Subnet Id')
@@ -22,6 +23,21 @@ pipeline{
                     aws sts assume-role \
                     --role-arn arn:aws:iam::${ACCOUNT}:role/AWSJenkinsDeploymentRole \
                     --role-session-name jenkins
+                '''
+            }
+            post {
+                failure {
+                    script {
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+        stage('Set Defualt Region') {
+            steps {
+                sh '''
+                    aws configure set default.region ${REGION}
                 '''
             }
             post {
