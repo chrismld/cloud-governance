@@ -14,3 +14,20 @@ You need to set up the environment by creating the administrator role that will 
 2. If you want to deploy the same template to any other account, enter to the stack and click on "Manage StackSet" and enter the AWS account destination number and the region.
 
 If you want to perform a change in the template role, you can do the change in the template and update the stack set. Then, apply the updates to the AWS accounts.
+
+## Pre-Commit Hook
+Before you can set up the pre-commit hook, you need to make sure that you have Python and pip installed. Then, you need to install the `pre-commit` framework with the following command `sudo pip install pre-commit`.
+
+Create the `.pre-commit-config.yaml` in the root of the repository with the following content:
+
+```
+# .pre-commit-config.yaml
+repos:
+-   repo: https://github.com/awslabs/cfn-python-lint
+    rev: v0.15.0 # The version of cfn-lint to use
+    hooks:
+    -   id: cfn-python-lint
+    files: src/.*\.(json|yml|yaml)$
+```
+
+Finally, install the hook with the following command `pre-commit install`.
