@@ -17,7 +17,9 @@ pipeline{
         stage('Assume Jekins Role') {
             steps {
                 sh '''
-                    aws sts assume-role --role-arn arn:aws:iam::123456789012:role/xaccounts3access --role-session-name s3-access-example
+                    aws sts assume-role 
+                    --role-arn arn:aws:iam::${ACCOUNT}:role/AWSJenkinsDeploymentRole 
+                    --role-session-name jenkins
                 '''
             }
             post {
