@@ -65,7 +65,7 @@ pipeline{
             steps {
                 sh '''
                     aws cloudformation deploy --stack-name bax-application-ec2 \
-                    --template-file file://ApplicationInstance.yml \
+                    --template-file ApplicationInstance.yml \
                     --parameter-overrides \
                         Env="${ENV_TAG}" \
                         VPCId="${VPCID}" \
