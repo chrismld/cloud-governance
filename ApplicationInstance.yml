@@ -92,7 +92,7 @@ Resources:
         ToPort: 80
         CidrIp: 0.0.0.0/0
 
-  AppServer1:
+  AppServer:
     Type: "AWS::EC2::Instance"
     Properties:
       BlockDeviceMappings:
@@ -123,25 +123,4 @@ Resources:
           Value: !Ref Env
         - Key: Appname
           Value: !Ref Appname 
-
-  DataDisk: 
-    Type: "AWS::EC2::Volume"
-    Properties:
-      AvailabilityZone: !GetAtt AppServer1.AvailabilityZone
-      Size : 100
-      Encrypted: true
-      VolumeType: gp2
-      Tags:
-          - Key: Name
-            Value: !Ref Appname
-          - Key: Env
-            Value: !Ref Env
-          - Key: Appname
-            Value: !Ref Appname
               
-  MountPoint:
-    Type: AWS::EC2::VolumeAttachment
-    Properties:
-      InstanceId: !Ref AppServer1
-      VolumeId: !Ref DataDisk
-      Device: /dev/sdh
