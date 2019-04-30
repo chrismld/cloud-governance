@@ -77,7 +77,7 @@ Resources:
   AppServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: sg-web-app
+      GroupName: web-app
       GroupDescription: Allow connection to the application
       VpcId:
         Ref: VPCId
