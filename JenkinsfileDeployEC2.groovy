@@ -3,7 +3,7 @@ pipeline{
     agent { label "master" }
 
     parameters {
-        choice(name: 'ACCOUNT', choices: ['351098335058','272318516296'], description: 'AWS Account')
+        choice(name: 'ACCOUNT', choices: ['351098335058','272318516296','097365445969','273434547788'], description: 'AWS Account')
         choice(name: 'REGION', choices: ['us-east-1','us-west-2'], description: 'AWS Region')
         choice(name: 'ENV', choices: ['dev','test','prod'], description: 'Environment')
         string(name: 'VPCID', description: 'VPC Id')
