@@ -19,11 +19,12 @@ pipeline{
     stages {        
         stage('Assume Jekins Role') {
             steps {
-                sh '''
-                    aws sts assume-role \
-                    --role-arn arn:aws:iam::${ACCOUNT}:role/AWSJenkinsDeploymentRole \
-                    --role-session-name jenkins
-                '''
+                script {
+                    env.STSRESPONSE=sh(returnStdout: true, script: "aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT}:role/AWSJenkinsDeploymentRole --role-session-name jenkins")
+                    env.AWS_ACCESS_KEY_ID = sh(returnStdout: true, script: "echo \$STSRESPONSE | jq -r .Credentials.AccessKeyId").trim()
+                    env.AWS_SECRET_ACCESS_KEY = sh (returnStdout: true, script: "echo \$STSRESPONSE | jq -r .Credentials.SecretAccessKey").trim()
+                    env.AWS_SESSION_TOKEN = sh (returnStdout: true, script: "echo \$STSRESPONSE | jq -r .Credentials.SessionToken").trim()
+                }
             }
             post {
                 failure {
