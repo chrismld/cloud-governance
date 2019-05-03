@@ -31,7 +31,7 @@ Parameters:
   AppServersSize:
     Description: Frontend Server instance type
     Type: String
-    Default: t3.large
+    Default: m4.large
     AllowedValues:
       - t3.medium
       - t3.large
