@@ -100,7 +100,7 @@ Resources:
           DeviceName: "/dev/sda1"
           Ebs:
             VolumeSize: 100
-            Encrypted: false
+            Encrypted: true
             VolumeType: gp2
             DeleteOnTermination: true
       ImageId:
